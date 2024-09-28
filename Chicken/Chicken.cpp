@@ -11,7 +11,7 @@ class Chicken
 		Chicken(int _age) : age(_age) {}
 		Chicken(int _age, const char *_name) : age(_age)
 		{
-			int len = strlen(_name) + 1;
+			int len = std::strlen(_name) + 1;
 			name = new char[len];
 			for (int i = 0; i < len; ++i)
 				name[i] = _name[i];
@@ -21,7 +21,7 @@ class Chicken
 			age = other.age;
 			if (other.name)
 			{
-				int len = strlen(other.name) + 1;
+				int len = std::strlen(other.name) + 1;
 				name = new char[len];
 				for (int i = 0; i < len; ++i)
 					name[i] = other.name[i];
@@ -39,7 +39,7 @@ class Chicken
 				age = other.age;
 				if (other.name)
 				{
-					int len = strlen(other.name) + 1;
+					int len = std::strlen(other.name) + 1;
 					name = new char[len];
 					for (int i = 0; i < len; ++i)
 						name[i] = other.name[i];
@@ -63,7 +63,7 @@ class Chicken
 		{
 			if (name != nullptr)
 				delete[] name;
-			int len = strlen(_name) + 1;
+			int len = std::strlen(_name) + 1;
 			name = new char[len];
 			for (int i = 0; i < len; ++i)
 				name[i] = _name[i];
