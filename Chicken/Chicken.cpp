@@ -61,6 +61,8 @@ class Chicken
 		}
 		void setName(const char *_name)
 		{
+			if (this->name == _name)
+				return;
 			if (name != nullptr)
 				delete[] name;
 			int len = std::strlen(_name) + 1;
