@@ -73,7 +73,7 @@ class SingleLinkedList {
 		
 		void remove() {
 			if (isEmpty()) return;
-			if (head == currentPos && currentPos) {
+			if (head == currentPos && currentPos->next) {
 				currentPos = currentPos->next;
 				delete head;
 				head = currentPos;
@@ -83,13 +83,14 @@ class SingleLinkedList {
 			} else {
 				Node* prev = head;
 				while (prev->next != currentPos) prev = prev->next;
-				if (currentPos) {
+				if (currentPos->next) {
 					prev->next = currentPos->next;
 					delete currentPos;
 					currentPos = prev->next;
 				} else {
 					delete currentPos;
 					currentPos = prev;
+					currentPos->next = nullptr;
 				}
 			}
 			return;
@@ -137,9 +138,20 @@ int main() {
 	c1.remove();
 	bool f = c2.find(9.0);
 	c2.remove();
+	c3.remove();
 	e.printList();
 	c1.printList();
 	c2.printList(); //测试【删除】操作是否正确，每种情况6分
+	c2.remove();    //测试【连续删除】
+	c2.printList();
+	c2.remove();
+	c2.printList();
+	c2.remove();
+	c2.printList();
+	c2.remove();
+	c2.printList();
+	c2.remove();
+	c2.printList();
 
 	return 0;
 }
