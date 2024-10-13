@@ -23,6 +23,13 @@ class SingleLinkedList {
 			}
 		}
 
+		~SingleLinkedList() {
+			if (!isEmpty()) {
+				while (currentPos->next != nullptr) currentPos = currentPos->next;
+				while (!isEmpty()) remove();
+			}
+		}
+
 		SingleLinkedList& operator=(SingleLinkedList& other) {
 			Node* currentPosBak = other.currentPos;
 			other.currentPos = other.head;
