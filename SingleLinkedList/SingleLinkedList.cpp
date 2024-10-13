@@ -5,9 +5,9 @@ template<typename T>
 class SingleLinkedList {
 	private:
 		struct Node {
-		T data;
-		Node* next;
-		Node(const T& _data) : data(_data), next(nullptr) {}
+			T data;
+			Node* next;
+			Node(const T& _data) : data(_data), next(nullptr) {}
 		};
 
 		Node* head;
