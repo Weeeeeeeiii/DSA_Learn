@@ -85,6 +85,15 @@ public:
         }
 
         /**
+         * @brief
+         */
+        const_iterator &operator--()
+        {
+            current = current->prev;
+            return *this;
+        }
+
+        /**
          * @brief 迭代器的后置自增运算符. 用于将迭代器指向下一个节点.
          *
          * @return const_iterator 下一个节点的迭代器.
@@ -95,6 +104,17 @@ public:
             ++(*this);
             return old;
         }
+
+        /**
+         * @brief
+         */
+        const_iterator operator--(int)
+        {
+            const_iterator old = *this;
+            --(*this);
+            return old;
+        }
+
 
         /// 这里我们看到前自增和后自增的区别. 就是 std::cout << *iter++ << std::endl;
         /// 和 std::cout << *++iter << std::endl; 的区别. 前者是先输出当前值，再自增；后者是先自增，再输出.
@@ -209,6 +229,12 @@ public:
             return *this;
         }
 
+        iterator &operator--()
+        {
+            this->current = this->current->prev;
+            return *this;
+        }
+
         /**
          * @brief 迭代器的后置自增运算符. 用于将迭代器指向下一个节点.
          *
@@ -218,6 +244,13 @@ public:
         {
             iterator old = *this;
             ++(*this);
+            return old;
+        }
+
+        iterator operator--(int)
+        {
+            iterator old = *this;
+            --(*this);
             return old;
         }
 
