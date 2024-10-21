@@ -5,6 +5,7 @@ int main()
 {
     // List 初始化
     List<int> lst_a{1, 2, 3, 4, 5};
+    if (!(lst_a.empty())) std::cout << "lst_a 初始化后为非空" << std::endl;
     std::cout << "lst_a 的初始值：" << std::endl;
     for (auto &i : lst_a) {
         std::cout << i << "\t";
@@ -20,6 +21,7 @@ int main()
 
     // push 测试
     List<int> lst_b;
+    if (lst_b.empty()) std::cout << "lst_b 初始化后为空" << std::endl;
     std::cout << "lst_b 从后 push 进 1 到 10 后：" << std::endl;
     for (int i = 1; i <= 10; ++i) {
         lst_b.push_back(i);
