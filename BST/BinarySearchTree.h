@@ -116,7 +116,7 @@ class BinarySearchTree
     void printTree(std::ostream &out = std::cout) const
     {
         if (isEmpty())
-            out << "Empty tree" << endl;
+            out << "Empty tree" << std::endl;
         else
             printTree(root, out);
     }
@@ -206,6 +206,20 @@ class BinarySearchTree
     }
 
     /**
+     * Find and delete the minimul node, return its pointer
+     */
+    BinaryNode* detachMin(BinaryNode *node, BinaryNode *& min_node)
+    {
+        if (!node->left)
+        {
+            min_node = node;
+            return node->right;
+        }
+        node->left = detachMin(node->left, min_node);
+        return node;
+    }
+
+    /**
      * Internal method to remove from a subtree.
      * x is the item to remove.
      * t is the node that roots the subtree.
@@ -221,8 +235,12 @@ class BinarySearchTree
             remove(x, t->right);
         else if (t->left != nullptr && t->right != nullptr) // Two children
         {
-            t->element = findMin(t->right)->element;
-            remove(t->element, t->right);
+            BinaryNode *min_node = nullptr;
+            t->right = detachMin(t->right, min_node);
+            min_node->left = t->left;
+            min_node->right = t->right;
+            delete t;
+            return;
         }
         else
         {
