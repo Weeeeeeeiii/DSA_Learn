@@ -208,14 +208,14 @@ class BinarySearchTree
     /**
      * Find and delete the minimul node, return its pointer
      */
-    BinaryNode* detachMin(BinaryNode *node, BinaryNode *& min_node)
+    BinaryNode* detachMin(BinaryNode *node, BinaryNode *& minNode)
     {
         if (!node->left)
         {
-            min_node = node;
+            minNode = node;
             return node->right;
         }
-        node->left = detachMin(node->left, min_node);
+        node->left = detachMin(node->left, minNode);
         return node;
     }
 
@@ -235,11 +235,13 @@ class BinarySearchTree
             remove(x, t->right);
         else if (t->left != nullptr && t->right != nullptr) // Two children
         {
-            BinaryNode *min_node = nullptr;
-            t->right = detachMin(t->right, min_node);
-            min_node->left = t->left;
-            min_node->right = t->right;
-            delete t;
+            BinaryNode *minNode = nullptr;
+            BinaryNode *oldNode = t;
+            detachMin(t->right, minNode);
+            t = minNode;
+            t->left = oldNode->left;
+            t->right = oldNode->right;
+            delete oldNode;
             return;
         }
         else
