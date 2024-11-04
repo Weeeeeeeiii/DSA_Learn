@@ -1,7 +1,8 @@
 #include <iostream>
-#include "BinarySearchTree.h"  // 假设 BinarySearchTree 类定义在这个头文件中
+#include "BinarySearchTree.h" // 假设 BinarySearchTree 类定义在这个头文件中
 
-void testBinarySearchTree() {
+void testBinarySearchTree()
+{
     BinarySearchTree<int> bst;
 
     // 测试插入功能
@@ -68,10 +69,11 @@ void testBinarySearchTree() {
     bst6.printTree();
 
     BinarySearchTree<int> bst7;
-    bst7.findMax();  // 测试异常处理
+    bst7.findMax(); // 测试异常处理
 }
 
-int main() {
+int main()
+{
     testBinarySearchTree();
     return 0;
 }
