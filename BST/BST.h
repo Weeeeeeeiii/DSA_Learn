@@ -171,6 +171,17 @@ class BinarySearchTree
     BinaryNode *root;
 
     /**
+     * Internal method to get the balence factor of node.
+     * Balance factor = left node height - right node height
+     * t is the pointer of the node
+     */
+    int getBalance(const BinaryNode *&t)
+    {
+        if (t == nullptr)
+            return 0;
+        return t->left->height - t->right->height;
+    }
+    /**
      * Internal method to insert into a subtree.
      * x is the item to insert.
      * t is the node that roots the subtree.
