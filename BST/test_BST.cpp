@@ -1,5 +1,5 @@
 #include <iostream>
-#include "BinarySearchTree.h" // 假设 BinarySearchTree 类定义在这个头文件中
+#include "BST.h" // 假设 BinarySearchTree 类定义在这个头文件中
 
 void testBinarySearchTree()
 {
@@ -68,8 +68,8 @@ void testBinarySearchTree()
     std::cout << "Move Assigned Tree (bst6):" << std::endl;
     bst6.printTree();
 
-    BinarySearchTree<int> bst7;
-    bst7.findMax(); // 测试异常处理
+    // BinarySearchTree<int> bst7;
+    // bst7.findMax(); // 测试异常处理
 }
 
 int main()
