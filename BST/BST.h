@@ -172,8 +172,8 @@ class BinarySearchTree
 
     /**
      * Internal method to get the balence factor of node.
-     * Balance factor = left node height - right node height
-     * t is the pointer of the node
+     * Balance factor = left node height - right node height.
+     * t is the pointer of the node.
      */
     int getBalance(const BinaryNode *&t)
     {
@@ -181,6 +181,46 @@ class BinarySearchTree
             return 0;
         return t->left->height - t->right->height;
     }
+
+    /**
+     * Right rotate a tree.
+     * t points root of subtree.
+     */
+    void rightRotate(BinaryNode *&t)
+    {
+        // Remenber child node
+        const BinaryNode *tmp = t->left;
+
+        // Let root point to child's right child
+        t->left = tmp->right;
+
+        // Let ordinary child node points to its root
+        tmp->right = t;
+
+        // Let root be the ordianry child node
+        t = tmp;
+
+        // Update heights
+        t->right->height = 1 + std::max(t->right->left->height, t->right->right->height);
+
+        t->height = 1 + std::max(t->left->height, t->right->height);
+    }
+
+    /**
+     * Left rotate a tree.
+     * Symetric to upside.
+     */
+    void leftRotate(BinaryNode *&t)
+    {
+        const BinaryNode *tmp = t->right;
+        t->right = tmp->left;
+        tmp->left = t;
+        t = tmp;
+
+        t->left->height = 1 + std::max(t->left->left->height, t->left->right->height);
+        t->height = 1 + std::max(t->left->height, t->right->height);
+    }
+
     /**
      * Internal method to insert into a subtree.
      * x is the item to insert.
