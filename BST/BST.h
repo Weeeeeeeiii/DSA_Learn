@@ -190,7 +190,7 @@ class BinarySearchTree
         {
             insert(x, t->right);
             if (t->height == t->right->height)
-                ++(t->height)
+                ++(t->height);
         }
         else
             ; // Duplicate; do nothing
@@ -208,15 +208,15 @@ class BinarySearchTree
             t = new BinaryNode{std::move(x), nullptr, nullptr};
         else if (x < t->element)
         {
-            insert(x, t->std::move(left));
+            insert(std::move(x), t->left);
             if (t->height == t->left->height)
                 ++(t->height);
         }
         else if (t->element < x)
         {
-            insert(x, t->std::move(right));
+            insert(std::move(x), t->right);
             if (t->height == t->right->height)
-                ++(t->height)
+                ++(t->height);
         }
         else
             ; // Duplicate; do nothing
