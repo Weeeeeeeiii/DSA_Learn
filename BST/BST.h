@@ -1,5 +1,5 @@
-#ifndef BINARY_SEARCH_TREE_H
-#define BINARY_SEARCH_TREE_H
+#ifndef BST_H
+#define BST_H
 
 #include "dsexceptions.h"
 #include <algorithm>
@@ -153,12 +153,13 @@ class BinarySearchTree
         remove(x, root);
     }
 
-  private:
+  protected:
     struct BinaryNode
     {
         Comparable element;
         BinaryNode *left;
         BinaryNode *right;
+        int height = 1;
 
         BinaryNode(const Comparable &theElement, BinaryNode *lt, BinaryNode *rt)
             : element{theElement}, left{lt}, right{rt} {}
@@ -180,9 +181,17 @@ class BinarySearchTree
         if (t == nullptr)
             t = new BinaryNode{x, nullptr, nullptr};
         else if (x < t->element)
+        {
             insert(x, t->left);
+            if (t->height == t->left->height)
+                ++(t->height);
+        }
         else if (t->element < x)
+        {
             insert(x, t->right);
+            if (t->height == t->right->height)
+                ++(t->height)
+        }
         else
             ; // Duplicate; do nothing
     }
@@ -198,9 +207,17 @@ class BinarySearchTree
         if (t == nullptr)
             t = new BinaryNode{std::move(x), nullptr, nullptr};
         else if (x < t->element)
-            insert(std::move(x), t->left);
+        {
+            insert(x, t->std::move(left));
+            if (t->height == t->left->height)
+                ++(t->height);
+        }
         else if (t->element < x)
-            insert(std::move(x), t->right);
+        {
+            insert(x, t->std::move(right));
+            if (t->height == t->right->height)
+                ++(t->height)
+        }
         else
             ; // Duplicate; do nothing
     }
