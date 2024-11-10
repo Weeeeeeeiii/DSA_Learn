@@ -1,0 +1,131 @@
+\documentclass[UTF8, a4paper, 12pt]{ctexart}
+
+\usepackage[left=2.4cm,right=2.2cm,top=2.8cm,bottom=2.2cm]{geometry}
+\usepackage{xcolor}
+%\usepackage{inconsolata}% would give a nice typewriter font
+\newcommand{\Cpp}{C\texttt{++}}
+\usepackage{listings}
+\usepackage{fancyhdr}
+
+\lstset{
+  language     = C++,
+  basicstyle   = \ttfamily,
+  keywordstyle = \color{blue}\textbf,
+  commentstyle = \color{gray},
+  stringstyle  = \color{green!70!black},
+  stringstyle  = \color{red},
+  columns      = fullflexible,
+  numbers      = left,
+  numberstyle  = \scriptsize\sffamily\color{gray},
+  %caption      = A hello world program in \Cpp,
+  showstringspaces = false,
+  float,
+}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{朱思威，3220104624}
+\chead{数据结构与算法第六次作业}
+\rhead{Nov.10, 2024}
+
+\begin{document}
+\section{remove 如何实现}
+
+\subsection{原 BST remove 的实现}
+公共接口 \verb|remove()| 通过调用内部的
+
+\begin{verbatim}
+    remove(const Comparable &x, BinaryNode *&t)
+\end{verbatim}
+
+来实现，其中 \verb|x| 是待删除的元素，\verb|t| 用来传入（子）树根节点指针的引用。
+
+然后通过递归来来查找到待删除元素的节点指针。当然，如果该元素不存在，则直接返回。接下来分两种情况：
+
+\begin{itemize}
+    \item 该节点的左右子节点均存在；
+    \item 该节点有一个子节点不存在。
+\end{itemize}
+
+较简单的一种情况是有一个子节点不存在，那么我们直接让 \verb|t| 指向子节点的另一子节点（若也不存在则 \verb|t| 为空指针），再释放原节点。参考代码如下：
+
+\begin{lstlisting}
+BinaryNode *oldNode = t;
+t = (t->left != nullptr) ? t->left : t->right;
+delete oldNode;
+return;
+\end{lstlisting}
+
+比较复杂的情况是两个子节点均存在，可以借助 \verb|detachMin(BinaryNode *&t)| 函数，其中 \verb|t| 作为（子）树的根节点指针引用传入。这个函数会在子树中寻找到含最小元素的节点，并在移除这个节点，以其指针作为返回值，实现如下：
+
+\begin{lstlisting}
+BinaryNode *detachMin(BinaryNode *&t)
+{
+    if (t->left != nullptr)
+    {
+        BinaryNode *oldNode = detachMin(t->left);
+
+        // Height servises the AVL tree
+        t->height = 1 + std::max(getHeight(t->left), getHeight(t->right)); 
+
+        return oldNode;
+    }
+    BinaryNode *detachNode = t;
+    t = detachNode->right;
+    return detachNode;
+}
+\end{lstlisting}
+
+随后调用 \verb|detachMin| 来“拆除” \verb|t| 指向的节点的右子树中含最小元素的节点，并返回它作为原节点的替代。
+
+\subsection{remove 后使用“旋转”使 tree 平衡}
+首先是 \verb|remove| 后得调整部分节点的高度，然后通过高度差来对不平衡的节点进行平衡。\verb|remove| 后的实现如下：
+
+\begin{lstlisting}
+// Update height of node
+t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
+
+// Rotate to make tree balance
+int balance = getBalance(t);
+if (balance > 1 && getBalance(t->left) >= 0)
+{
+    rightRotate(t);
+}
+else if (balance > 1 && getBalance(t->left) < 0)
+{
+    leftRotate(t->left);
+    rightRotate(t);
+}
+else if (balance < -1 && getBalance(t->right) <= 0)
+{
+    leftRotate(t);
+}
+else if (balance < -1 && getBalance(t->right) > 0)
+{
+    rightRotate(t->right);
+    leftRotate(t);
+}
+else
+    ;
+\end{lstlisting}
+
+这样就在删除后将树“旋转”至平衡，并更新节点高度。
+
+\section{测试结果}
+
+成功编译运行 \verb|test.cpp|，耗时：
+
+\begin{verbatim}
+real    0m1.376s
+user    0m1.367s
+sys     0m0.000s
+\end{verbatim}
+
+使用的 CPU 为 AMD Ryzen 5 5600G，开启 O2 优化。本机必须通过
+
+\begin{verbatim}
+$ ulimit -s unlimited
+\end{verbatim}
+
+取消系统栈空间限制才能正常运行，否则报字段错误。
+\end{document}
