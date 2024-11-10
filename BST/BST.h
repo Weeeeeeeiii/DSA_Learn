@@ -211,9 +211,9 @@ class BinarySearchTree
         t = tmp;
 
         // Update heights
-        t->right->height = 1 + std::max(t->right->left->height, t->right->right->height);
+        t->right->height = 1 + std::max(getHeight(t->right->left), getHeight(t->right->right));
 
-        t->height = 1 + std::max(t->left->height, t->right->height);
+        t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
     }
 
     /**
@@ -227,38 +227,16 @@ class BinarySearchTree
         tmp->left = t;
         t = tmp;
 
-        t->left->height = 1 + std::max(t->left->left->height, t->left->right->height);
-        t->height = 1 + std::max(t->left->height, t->right->height);
+        t->left->height = 1 + std::max(getHeight(t->left->left), getHeight(t->left->right));
+        t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
     }
 
     /**
-     * Internal method to insert into a subtree.
-     * x is the item to insert.
-     * t is the node that roots the subtree.
-     * Set the new root of the subtree.
+     * Rotate the node after insert.
+     * t is the node pointer from its parent node.
      */
-    void insert(const Comparable &x, BinaryNode *&t)
+    void rotate(const Comparable &x, BinaryNode *&t)
     {
-        if (t == nullptr)
-        {
-            t = new BinaryNode{x, nullptr, nullptr};
-            return;
-        }
-        else if (x < t->element)
-        {
-            insert(x, t->left);
-            if (t->height == t->left->height)
-                ++(t->height);
-        }
-        else if (t->element < x)
-        {
-            insert(x, t->right);
-            if (t->height == t->right->height)
-                ++(t->height);
-        }
-        else
-            return; // Duplicate; do nothing
-
         // Get balance factor
         int balance = getBalance(t);
 
@@ -290,6 +268,37 @@ class BinarySearchTree
      * t is the node that roots the subtree.
      * Set the new root of the subtree.
      */
+    void insert(const Comparable &x, BinaryNode *&t)
+    {
+        if (t == nullptr)
+        {
+            t = new BinaryNode{x, nullptr, nullptr};
+            return;
+        }
+        else if (x < t->element)
+        {
+            insert(x, t->left);
+            if (t->height == t->left->height)
+                ++(t->height);
+        }
+        else if (t->element < x)
+        {
+            insert(x, t->right);
+            if (t->height == t->right->height)
+                ++(t->height);
+        }
+        else
+            return; // Duplicate; do nothing
+
+        rotate(x, t);
+    }
+
+    /**
+     * Internal method to insert into a subtree.
+     * x is the item to insert.
+     * t is the node that roots the subtree.
+     * Set the new root of the subtree.
+     */
     void insert(Comparable &&x, BinaryNode *&t)
     {
         if (t == nullptr)
@@ -308,6 +317,8 @@ class BinarySearchTree
         }
         else
             ; // Duplicate; do nothing
+
+        rotate(x, t);
     }
 
     /**
