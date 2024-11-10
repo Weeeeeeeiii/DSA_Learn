@@ -180,8 +180,9 @@ class BinarySearchTree
             return 0;
         return t->height;
     }
+
     /**
-     * Internal method to get the balence factor of node.
+     * Get the balence factor of node.
      * Balance factor = left node height - right node height.
      * t is the pointer of the node.
      */
@@ -322,17 +323,16 @@ class BinarySearchTree
     }
 
     /**
-     * Find and delete the minimul node, return its pointer
+     * Find and detach the minimul node, return its pointer.
+     * t is the pointer of root of subtree (default right subtree).
      */
-    BinaryNode* detachMin(BinaryNode *node, BinaryNode *& minNode)
+    BinaryNode *detachMin(BinaryNode *&t)
     {
-        if (!node->left)
-        {
-            minNode = node;
-            return node->right;
-        }
-        node->left = detachMin(node->left, minNode);
-        return node;
+        if (t->left != nullptr)
+            return detachMin(t->left);
+        BinaryNode *detachNode = t;
+        t = detachNode->right;
+        return detachNode;
     }
 
     /**
@@ -351,14 +351,11 @@ class BinarySearchTree
             remove(x, t->right);
         else if (t->left != nullptr && t->right != nullptr) // Two children
         {
-            BinaryNode *minNode = nullptr;
             BinaryNode *oldNode = t;
-            detachMin(t->right, minNode);
-            t = minNode;
+            t = detachMin(t->right);
             t->left = oldNode->left;
             t->right = oldNode->right;
             delete oldNode;
-            return;
         }
         else
         {
