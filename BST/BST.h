@@ -233,7 +233,7 @@ class BinarySearchTree
     }
 
     /**
-     * Rotate the node after insert.
+     * Auto rotate the node after being modified.
      * t is the node pointer from its parent node.
      */
     void rotate(const Comparable &x, BinaryNode *&t)
@@ -352,12 +352,10 @@ class BinarySearchTree
         if (x < t->element)
         {
             remove(x, t->left);
-            t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
         }
         else if (t->element < x)
         {
             remove(x, t->right);
-            t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
         }
         else if (t->left != nullptr && t->right != nullptr) // Two children
         {
@@ -365,7 +363,6 @@ class BinarySearchTree
             t = detachMin(t->right);
             t->left = oldNode->left;
             t->right = oldNode->right;
-            t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
             delete oldNode;
         }
         else
@@ -373,7 +370,31 @@ class BinarySearchTree
             BinaryNode *oldNode = t;
             t = (t->left != nullptr) ? t->left : t->right;
             delete oldNode;
+            return;
         }
+        t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
+
+        int balance = getBalance(t);
+        if (balance > 1 && getBalance(t->left) >= 0)
+        {
+            rightRotate(t);
+        }
+        else if (balance > 1 && getBalance(t->left) < 0)
+        {
+            leftRotate(t->left);
+            rightRotate(t);
+        }
+        else if (balance < -1 && getBalance(t->right) <= 0)
+        {
+            leftRotate(t);
+        }
+        else if (balance < -1 && getBalance(t->right) > 0)
+        {
+            rightRotate(t->right);
+            leftRotate(t);
+        }
+        else
+            ;
     }
 
     /**
