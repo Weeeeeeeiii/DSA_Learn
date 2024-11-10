@@ -1,6 +1,6 @@
-\documentclass[UTF8, a4paper, 12pt]{ctexart}
+\documentclass[UTF8]{ctexart}
 
-\usepackage[left=2.4cm,right=2.2cm,top=2.8cm,bottom=2.2cm]{geometry}
+\usepackage{geometry}
 \usepackage{xcolor}
 %\usepackage{inconsolata}% would give a nice typewriter font
 \newcommand{\Cpp}{C\texttt{++}}
@@ -21,7 +21,11 @@
   showstringspaces = false,
   float,
 }
-
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+\setlength{\headheight}{13pt}
 \pagestyle{fancy}
 \fancyhead{}
 \lhead{朱思威，3220104624}
@@ -129,3 +133,8 @@ $ ulimit -s unlimited
 
 取消系统栈空间限制才能正常运行，否则报字段错误。
 \end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
