@@ -329,7 +329,11 @@ class BinarySearchTree
     BinaryNode *detachMin(BinaryNode *&t)
     {
         if (t->left != nullptr)
-            return detachMin(t->left);
+        {
+            BinaryNode *oldNode = detachMin(t->left);
+            t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
+            return oldNode;
+        }
         BinaryNode *detachNode = t;
         t = detachNode->right;
         return detachNode;
@@ -346,15 +350,22 @@ class BinarySearchTree
         if (t == nullptr)
             return; // Item not found; do nothing
         if (x < t->element)
+        {
             remove(x, t->left);
+            t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
+        }
         else if (t->element < x)
+        {
             remove(x, t->right);
+            t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
+        }
         else if (t->left != nullptr && t->right != nullptr) // Two children
         {
             BinaryNode *oldNode = t;
             t = detachMin(t->right);
             t->left = oldNode->left;
             t->right = oldNode->right;
+            t->height = 1 + std::max(getHeight(t->left), getHeight(t->right));
             delete oldNode;
         }
         else
