@@ -171,15 +171,25 @@ class BinarySearchTree
     BinaryNode *root;
 
     /**
+     * Get heigiht of node.
+     * t is the pointer of the node.
+     */
+    int getHeight(BinaryNode *t)
+    {
+        if (t == nullptr)
+            return 0;
+        return t->height;
+    }
+    /**
      * Internal method to get the balence factor of node.
      * Balance factor = left node height - right node height.
      * t is the pointer of the node.
      */
-    int getBalance(const BinaryNode *&t)
+    int getBalance(BinaryNode *t)
     {
         if (t == nullptr)
             return 0;
-        return t->left->height - t->right->height;
+        return getHeight(t->left) - getHeight(t->right);
     }
 
     /**
@@ -189,7 +199,7 @@ class BinarySearchTree
     void rightRotate(BinaryNode *&t)
     {
         // Remenber child node
-        const BinaryNode *tmp = t->left;
+        BinaryNode * const tmp = t->left;
 
         // Let root point to child's right child
         t->left = tmp->right;
@@ -212,7 +222,7 @@ class BinarySearchTree
      */
     void leftRotate(BinaryNode *&t)
     {
-        const BinaryNode *tmp = t->right;
+        BinaryNode * const tmp = t->right;
         t->right = tmp->left;
         tmp->left = t;
         t = tmp;
@@ -230,7 +240,10 @@ class BinarySearchTree
     void insert(const Comparable &x, BinaryNode *&t)
     {
         if (t == nullptr)
+        {
             t = new BinaryNode{x, nullptr, nullptr};
+            return;
+        }
         else if (x < t->element)
         {
             insert(x, t->left);
@@ -244,7 +257,31 @@ class BinarySearchTree
                 ++(t->height);
         }
         else
-            ; // Duplicate; do nothing
+            return; // Duplicate; do nothing
+
+        // Get balance factor
+        int balance = getBalance(t);
+
+        if (balance > 1 && x < t->left->element)
+        {
+            rightRotate(t);
+        }
+        else if (balance > 1 && x > t->left->element)
+        {
+            leftRotate(t->left);
+            rightRotate(t);
+        }
+        else if (balance < -1 && x > t->right->element)
+        {
+            leftRotate(t);
+        }
+        else if (balance < -1 && x < t->right->element)
+        {
+            rightRotate(t->right);
+            leftRotate(t);
+        }
+        else
+            ;
     }
 
     /**
