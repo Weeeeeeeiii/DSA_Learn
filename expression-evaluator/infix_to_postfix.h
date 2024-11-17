@@ -64,7 +64,8 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
             if (IsOperator(c))
             {
                 // Pop operator from stack out until precedence of c is greater
-                while (!operators.empty() && Precedence(operators.top()) >= Precedence(c))
+                while (!operators.empty() && 
+                Precedence(operators.top()) >= Precedence(c))
                 {
                     output.push(std::string(1, operators.top()));
                     operators.pop();
@@ -88,7 +89,9 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
                 operators.pop();
             }
             else
-                throw std::invalid_argument(std::string("Invalid character: ") + c);
+                throw std::invalid_argument(
+                    std::string("Invalid character: ") + c
+                );
         }
     }
 
@@ -108,4 +111,4 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
     return output;
 }
 
-#endif
+#endif // INFIX_TO_POSTFIX_H_
