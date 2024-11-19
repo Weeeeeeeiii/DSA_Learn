@@ -82,12 +82,13 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
             {
                 if (c == '-' && ExpectNegative)
                 {
-                    // If it is negative sign, push into buffer
-                    buffer += c;
+                    // If it is negative sign, push 0 into output queue
+                    output.push("0");
+                    operators.push(c);
                 }
                 else
                 {
-                    // Pop operator from stack out until precedence of c is 
+                    // Pop operator from stack out until precedence of c is
                     // greater, when '-' is substraction
                     while (!operators.empty() &&
                            Precedence(operators.top()) >= Precedence(c))
@@ -96,10 +97,10 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
                         operators.pop();
                     }
                     operators.push(c);
-
-                    // Expect negative after operator
-                    ExpectNegative = true;
                 }
+
+                // Expect negative after operator
+                ExpectNegative = true;
             }
             else if (c == '(')
             {
