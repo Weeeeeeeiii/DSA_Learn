@@ -9,10 +9,21 @@
 
 int main()
 {
-    std::cout << "Please enter expression with only 4 fundamental rules:\n";
+    std::cout << "Please enter expression with only 4 fundamental rules.\n";
+    std::cout << "Only accept valid symbols like [0-9] and '+', '-', '*', '/',";
+    std::cout << " '(', ')'.\n";
+    std::cout << "Note: The brackets must be paired.\n";
     std::string expression{};
     std::getline(std::cin >> std::ws, expression);
-    std::cout << EvaluateExpression(expression);
-    
+
+    try
+    {
+        std::cout << EvaluateExpression(expression) << std::endl;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "Fatal: " << e.what() << std::endl;
+    }
+
     return 0;
 }

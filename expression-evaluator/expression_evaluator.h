@@ -34,7 +34,7 @@ double EvaluateExpression(const std::string &expression)
 
             // Check if values is valid
             if (values.size() < 2)
-                throw std::invalid_argument("Invalid RPN expression");
+                throw std::invalid_argument("Too many operations");
             
             // If values is valid, pop and calculate the result of the top 2 
             // value, then push result back to stack
@@ -63,12 +63,12 @@ double EvaluateExpression(const std::string &expression)
         }
         else
         {
-            throw std::invalid_argument("Invalid token in RPN");
+            throw std::invalid_argument("Invalid charactor in expression");
         }
     }
 
     if (values.size() != 1)
-    throw std::invalid_argument("Invalid RPN expression");
+    throw std::invalid_argument("Operation missing, the multiplication sign cannot be omitted");
 
     return values.top();
 }
