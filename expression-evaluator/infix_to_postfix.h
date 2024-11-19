@@ -32,6 +32,14 @@ bool IsOperator(char c)
 }
 
 /**
+ * Check if a charactor is an numeric, digit and '.' included.
+ */
+bool IsNumeric(char c)
+{
+    return std::isdigit(c) || c == '.';
+}
+
+/**
  * Use shungting-yard algorithm to translate infix expression to RPN.
  */
 std::queue<std::string> InfixToPostfix(const std::string &infix)
@@ -50,7 +58,7 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
             continue;
 
         // Store multi-digit numbers
-        if (std::isdigit(c))
+        if (IsNumeric(c))
             buffer += c;
         else
         {
