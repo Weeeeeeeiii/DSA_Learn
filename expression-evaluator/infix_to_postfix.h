@@ -51,6 +51,10 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
     // buffer here is used to save multi-digit numbers
     std::string buffer{};
 
+    // Check if it is a negative sign or substraction, expect negative symbol at
+    // the beginning
+    bool ExpectNegative{true};
+
     for (char c : infix)
     {
         // Ignore spaces
@@ -59,7 +63,12 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
 
         // Store multi-digit numbers
         if (IsNumeric(c))
+        {
             buffer += c;
+
+            // After a numeric, do not expect negative
+            ExpectNegative = false;
+        }
         else
         {
             // Push number in buffer into output queue
@@ -71,18 +80,33 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
 
             if (IsOperator(c))
             {
-                // Pop operator from stack out until precedence of c is greater
-                while (!operators.empty() && 
-                Precedence(operators.top()) >= Precedence(c))
+                if (c == '-' && ExpectNegative)
                 {
-                    output.push(std::string(1, operators.top()));
-                    operators.pop();
+                    // If it is negative sign, push into buffer
+                    buffer += c;
                 }
-                operators.push(c);
+                else
+                {
+                    // Pop operator from stack out until precedence of c is 
+                    // greater, when '-' is substraction
+                    while (!operators.empty() &&
+                           Precedence(operators.top()) >= Precedence(c))
+                    {
+                        output.push(std::string(1, operators.top()));
+                        operators.pop();
+                    }
+                    operators.push(c);
+
+                    // Expect negative after operator
+                    ExpectNegative = true;
+                }
             }
             else if (c == '(')
             {
                 operators.push(c);
+
+                // Expect negative after '('
+                ExpectNegative = true;
             }
             else if (c == ')')
             {
@@ -95,6 +119,9 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
                 if (operators.empty())
                     throw std::invalid_argument("Mismatched parentheses");
                 operators.pop();
+
+                // Expect substraction after ')'
+                ExpectNegative = false;
             }
             else
                 throw std::invalid_argument(
