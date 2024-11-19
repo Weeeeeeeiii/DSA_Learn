@@ -84,6 +84,10 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
                 {
                     // If it is negative sign, push 0 into output queue
                     output.push("0");
+
+                    // Add '-' to stack whatever the precedence is, it's 
+                    // necessary because we must ensure "-a" must be transformed
+                    // into "0 a -" in RPN
                     operators.push(c);
                 }
                 else
