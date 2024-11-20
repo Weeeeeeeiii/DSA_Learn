@@ -17,11 +17,14 @@
 unsigned char Precedence(char opr)
 {
     if (opr == '+' || opr == '-')
+    {
         return 1;
-    else if (opr == '*' || opr == '/')
+    }
+    if (opr == '*' || opr == '/')
+    {
         return 2;
-    else
-        return 0;
+    }
+    return 0;
 }
 /**
  * Check if a charactor is an operator amoung 4 rules.
@@ -32,11 +35,24 @@ bool IsOperator(char c)
 }
 
 /**
- * Check if a charactor is an numeric, digit and '.' included.
+ * Check if a charactor is a valid decimal point.
  */
-bool IsNumeric(char c)
+bool IsValidDecimalPoint(char c, bool is_added, const std::string &buffer)
 {
-    return std::isdigit(c) || c == '.';
+    if (c != '.')
+    {
+        return false;
+    }
+    if (!buffer.length())
+    {
+        throw std::invalid_argument("No digits before the decimal point");
+    }
+
+    if (!is_added)
+    {
+        return true;
+    }
+    throw std::invalid_argument("Mutiple decimal points exist");
 }
 
 /**
@@ -53,91 +69,116 @@ std::queue<std::string> InfixToPostfix(const std::string &infix)
 
     // Check if it is a negative sign or substraction, expect negative symbol at
     // the beginning
-    bool ExpectNegative{true};
+    bool expect_negative{true};
+
+    // Check if the decimal point has been added
+    bool is_added{false};
 
     for (char c : infix)
     {
         // Ignore spaces
         if (std::isspace(c))
+        {
             continue;
+        }
 
-        // Store multi-digit numbers
-        if (IsNumeric(c))
+        // Push numerical charactor into output queue
+        if (IsValidDecimalPoint(c, is_added, buffer))
+        {
+            buffer += c;
+
+            // '.' has been added
+            is_added = true;
+
+            continue;
+        }
+        if (std::isdigit(c))
         {
             buffer += c;
 
             // After a numeric, do not expect negative
-            ExpectNegative = false;
+            expect_negative = false;
+
+            continue;
         }
-        else
+
+        // Push number in buffer into output queue
+        if (!buffer.empty())
         {
-            // Push number in buffer into output queue
-            if (!buffer.empty())
-            {
-                output.push(buffer);
-                buffer.clear();
-            }
+            output.push(buffer);
+            buffer.clear();
+            is_added = false;
+        }
 
-            if (IsOperator(c))
+        // Begin addressing operator
+        if (IsOperator(c))
+        {
+            if (c == '-' && expect_negative)
             {
-                if (c == '-' && ExpectNegative)
-                {
-                    // If it is negative sign, push 0 into output queue
-                    output.push("0");
+                // If it is negative sign, push 0 into output queue
+                output.push("0");
 
-                    // Add '-' to stack whatever the precedence is, it's 
-                    // necessary because we must ensure "-a" must be transformed
-                    // into "0 a -" in RPN
-                    operators.push(c);
-                }
-                else
-                {
-                    // Pop operator from stack out until precedence of c is
-                    // greater, when '-' is substraction
-                    while (!operators.empty() &&
-                           Precedence(operators.top()) >= Precedence(c))
-                    {
-                        output.push(std::string(1, operators.top()));
-                        operators.pop();
-                    }
-                    operators.push(c);
-                }
-
-                // Expect negative after operator
-                ExpectNegative = true;
-            }
-            else if (c == '(')
-            {
+                // Add '-' to stack whatever the precedence is, it's
+                // necessary because we must ensure "-a" must be transformed
+                // into "0 a -" in RPN
                 operators.push(c);
-
-                // Expect negative after '('
-                ExpectNegative = true;
             }
-            else if (c == ')')
+            else
             {
-                // Pop all operators in parentheses
-                while (!operators.empty() && operators.top() != '(')
+                // Pop operator from stack out until precedence of c is
+                // greater, when '-' is substraction
+                while (!operators.empty() &&
+                       Precedence(operators.top()) >= Precedence(c))
                 {
                     output.push(std::string(1, operators.top()));
                     operators.pop();
                 }
-                if (operators.empty())
-                    throw std::invalid_argument("Mismatched parentheses");
-                operators.pop();
-
-                // Expect substraction after ')'
-                ExpectNegative = false;
+                operators.push(c);
             }
-            else
-                throw std::invalid_argument(
-                    std::string("Invalid character: ") + c
-                );
+
+            // Expect negative after operator
+            expect_negative = true;
+
+            continue;
         }
+        if (c == '(')
+        {
+            operators.push(c);
+
+            // Expect negative after '('
+            expect_negative = true;
+
+            continue;
+        }
+        if (c == ')')
+        {
+            // Pop all operators in parentheses
+            while (!operators.empty() && operators.top() != '(')
+            {
+                output.push(std::string(1, operators.top()));
+                operators.pop();
+            }
+            if (operators.empty())
+            {
+                throw std::invalid_argument("Mismatched parentheses");
+            }
+            operators.pop();
+
+            // Expect substraction after ')'
+            expect_negative = false;
+
+            continue;
+        }
+
+        throw std::invalid_argument(
+            std::string("Invalid character: ") + c);
     }
 
     // Push remaining digits in buffer into output queue
     if (!buffer.empty())
+    {
         output.push(buffer);
+    }
 
     // Push remaining operators in stack into output queue
     while (!operators.empty())
