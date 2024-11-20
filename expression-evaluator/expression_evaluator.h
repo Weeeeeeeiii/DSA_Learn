@@ -26,44 +26,42 @@ double EvaluateExpression(const std::string &expression)
         rpn_queue.pop();
 
         if (std::isdigit(token[0]) || (token.size() > 1 && token[0] == '-'))
-            // token is a digit
+        {
+          // token is a digit
             values.push(std::stod(token));
-        else if (IsOperator(token[0]))
-        {
-            // token is an operator
-
-            // Check if values is valid
-            if (values.size() < 2)
-                throw std::invalid_argument("Too many operations");
-            
-            // If values is valid, pop and calculate the result of the top 2 
-            // value, then push result back to stack
-            double b = values.top();
-            values.pop();
-            double a = values.top();
-            values.pop();
-
-            switch (token[0])
-            {
-              case '+':
-                values.push(a + b);
-                break;
-              case '-':
-                values.push(a - b);
-                break;
-              case '*':
-                values.push(a * b);
-                break;
-              case '/':
-                if (b == 0)
-                    throw std::invalid_argument("Division by zero");
-                values.push(a / b);
-                break;
-            }
+            continue;
         }
-        else
+
+        // token is an operator
+        // Check if values is valid
+        if (values.size() < 2)
         {
-            throw std::invalid_argument("Invalid charactor in expression");
+            throw std::invalid_argument("Too many operations");
+        }
+
+        // If values is valid, pop and calculate the result of the top 2 
+        // value, then push result back to stack
+        double b = values.top();
+        values.pop();
+        double a = values.top();
+        values.pop();
+
+        switch (token[0])
+        {
+          case '+':
+            values.push(a + b);
+            break;
+          case '-':
+            values.push(a - b);
+            break;
+          case '*':
+            values.push(a * b);
+            break;
+          case '/':
+            if (b == 0)
+                throw std::invalid_argument("Division by zero");
+            values.push(a / b);
+            break;
         }
     }
 
