@@ -5,6 +5,7 @@
 #include <string>
 #include <cctype>
 #include <stdexcept>
+#include <cassert>
 
 /**
  * Calculate the expression of reverse Polish notation (RPN).
@@ -25,7 +26,7 @@ double EvaluateExpression(const std::string &expression)
         const std::string token = rpn_queue.front();
         rpn_queue.pop();
 
-        if (std::isdigit(token[0]) || (token.size() > 1 && token[0] == '-'))
+        if (std::isdigit(token[0]))
         {
           // token is a digit
             values.push(std::stod(token));
@@ -62,12 +63,17 @@ double EvaluateExpression(const std::string &expression)
                 throw std::invalid_argument("Division by zero");
             values.push(a / b);
             break;
+          default:
+            assert(false && 
+            "Charactor not operators and parentheses be passed into expressing_evaluator.h");
         }
     }
 
     if (values.size() != 1)
-    throw std::invalid_argument("Operation missing, the multiplication sign cannot be omitted");
-
+    {
+      throw std::invalid_argument(
+        "Operation missing, the multiplication sign cannot be omitted");
+    }
     return values.top();
 }
 
