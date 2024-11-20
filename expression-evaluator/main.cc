@@ -6,19 +6,17 @@
 #include "expression_evaluator.h"
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
 int main()
 {
-    std::cout << "Please enter expression with only 4 fundamental rules.\n";
-    std::cout << "Only accept valid symbols like [0-9] and '+', '-', '*', '/',";
-    std::cout << " '(', ')'.\n";
-    std::cout << "Note: The brackets must be paired.\n";
+    std::cout << "Please enter the four arithmetic expression.\n";
+    std::cout << "Valid charactors: [0-9] + - * / ( )\n";
     std::string expression{};
     std::getline(std::cin >> std::ws, expression);
-
     try
     {
-        std::cout << EvaluateExpression(expression) << std::endl;
+        std::cout << "Result: " << EvaluateExpression(expression) << std::endl;
     }
     catch(const std::exception& e)
     {
