@@ -1,0 +1,82 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry, CJKutf8}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+% useful packages.
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+
+\lstset{
+    basicstyle=\ttfamily, basewidth=0.5em
+}
+
+% some common command
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
+\newcommand{\difFrac}[2]{\frac{\dif #1}{\dif #2}}
+\newcommand{\pdfFrac}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\OFL}{\mathrm{OFL}}
+\newcommand{\UFL}{\mathrm{UFL}}
+\newcommand{\fl}{\mathrm{fl}}
+\newcommand{\op}{\odot}
+\newcommand{\Eabs}{E_{\mathrm{abs}}}
+\newcommand{\Erel}{E_{\mathrm{rel}}}
+
+\begin{document}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{朱思威, 3220104624}
+\chead{数据结构与算法项目作业：四则混合运算器}
+\rhead{\today}
+
+\section{设计思路}
+
+四则混合运算器仅考虑字符 \verb|+ - * / . ( )| 空子符和数字字符 \verb|[0-9]| 的输入。故设置循环字符变量 \verb|c| 遍历整个表达式，并分别根据其类型进行不同的处理。
+
+\subsection{预处理}
+
+首先将原本的字符串类型的中缀表达式转换为字符串 token 数组组成的后缀表达式，将多个数字字符组成的一个数放入一个 token 中，将算符独立放在一个 token 中，这样就方便后续的计算。
+
+采用的算法是 Shungting Yard 算法：创建一个存放数的队列和存放算符的栈，通过算符的优先级根据一定的规则将算符依次放入栈和队列中。具体的实现在头文件 \verb|infix_to_postfix.h| 中。
+
+\subsubsection{关于负数的处理}
+
+\verb|infix_to_postfix| 通过 Boolean 变量 \verb|expect_negative| 来判断当 \verb|c = '-'| 时，\verb|c| 代表的是操作符减号还是放在数前面的负号。如果检测到是负号，形如 \verb|-x|，则转换为 \verb|(0-x)| 来处理。
+
+\subsubsection{关于小数的处理}
+
+另一个 Boolean 变量 \verb|is_added| 用于判断数中的小数点是否已添加，如果其值为 \verb|true|，那么在遇到小数点后报错：多个小数点。
+
+\subsection{计算}
+
+将处理完的表达式进行计算：把其中的 token 一一压入另一个栈中。如果 token 是数字则直接压入不做任何操作；如果 token 是算符则首先检查粘中是否至少有两个数 token，没有则报错。然后将两个数字退出并做相应的计算，将计算结果再次压回栈中。具体的实现在头文件 \verb|express_evaluator.h| 中。
+
+\subsection{主程序}
+
+主程序调用 \verb|express_evaluator.h| 中的计算函数 \verb|EvaluateExpression| 来计算从终端传入的字符串，并抓取异常抛出。若无异常则给出计算结果。
+
+\section{结果处理}
+
+在当前目录下通过命令 \verb|make main| 即可输入表达式。如果输入的是合法表达式，那么直接给出结果；反之丢出异常提示。
+
+命令 \verb|make test| 即可根据 \verb|express_evaluator.h| 生成一个测试文件。其中提供了各种不同的合法测试和不合法测试。如果出现合法测试报异常或不合法测试不报异常则测试程序中断，否则最后输出 \verb|All tests passed|。
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
