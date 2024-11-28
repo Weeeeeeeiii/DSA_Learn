@@ -42,10 +42,11 @@ void Heapify(std::vector<T> &array, std::size_t length, std::size_t index)
 template <typename T>
 void SortHeap(std::vector<T> &array)
 {
-    for (auto length{std::ssize(array) - 1}; length > 0; --length)
+    auto length{std::ssize(array)};
+    for (auto index{length - 1}; index > 0; --index)
     {
-        std::swap(array.data()[0], array.data()[length]);
-        Heapify(array, static_cast<std::size_t> (length), 0);
+        std::swap(array.data()[0], array.data()[index]);
+        Heapify(array, static_cast<std::size_t> (index), 0);
     }
 }
 #endif
