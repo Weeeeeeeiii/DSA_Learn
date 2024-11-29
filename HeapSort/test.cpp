@@ -2,39 +2,36 @@
  * test program for HeapSort.h.
  */
 
-#include "HeapSort.h"
+#include <algorithm>
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
-int main()
-{
-    std::vector<int> array{1, 2, 3, 4, 5, 6, 7};
-    std::vector<int> array2{array};
-    std::make_heap(array.begin(), array.end());
-    std::make_heap(array2.begin(), array2.end());
-    std::cout << "heap element: ";
-    for (auto &i : array)
-    {
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;
+#include "HeapSort.h"
 
-    SortHeap(array);
-    std::cout << "SortHeap element: ";
-    for (auto &i : array)
-    {
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;
+int main() {
+  std::vector<int> vec{1, 2, 3, 4, 5, 6, 7};
+  std::vector<int> vec2{1, 2, 3, 4, 5, 6, 7};
+  std::make_heap(vec.begin(), vec.end());
+  std::make_heap(vec2.begin(), vec2.end());
+  std::cout << "heap element: ";
+  for (auto &i : vec) {
+    std::cout << i << " ";
+  }
+  std::cout << std::endl;
 
-    std::sort_heap(array2.begin(), array2.end());
-    std::cout << "heap sorted element: ";
-    for (auto &i : array2)
-    {
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;
+  SortHeap(vec);
+  std::cout << "SortHeap element: ";
+  for (auto &i : vec) {
+    std::cout << i << " ";
+  }
+  std::cout << std::endl;
 
-    return 0;
+  std::sort_heap(vec2.begin(), vec2.end());
+  std::cout << "heap sorted element: ";
+  for (auto &i : vec2) {
+    std::cout << i << " ";
+  }
+  std::cout << std::endl;
+
+  return 0;
 }

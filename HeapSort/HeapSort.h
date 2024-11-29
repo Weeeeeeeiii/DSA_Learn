@@ -4,8 +4,8 @@
 #ifndef HEAP_SORT_H_
 #define HEAP_SORT_H_
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 /**
  * Recursively swap the maximum with the parent node.
@@ -13,26 +13,23 @@
  * `length` represents `length of vector - length of elements has been sorted`.
  */
 template <typename T>
-void Heapify(std::vector<T> &array, std::size_t length, std::size_t index)
-{
-    auto left_child{index * 2 + 1};
-    auto right_child{left_child + 1};
-    auto largest{index};
+void Heapify(std::vector<T> &vec, typename std::vector<T>::size_type length,
+             typename std::vector<T>::size_type index) {
+  auto left_child{index * 2 + 1};
+  auto right_child{left_child + 1};
+  auto largest{index};
 
-    if (left_child < length && array[left_child] > array[largest])
-    {
-        largest = left_child;
-    }
-    if (right_child < length && array[right_child] > array[largest])
-    {
-        largest = right_child;
-    }
+  if (left_child < length && vec[left_child] > vec[largest]) {
+    largest = left_child;
+  }
+  if (right_child < length && vec[right_child] > vec[largest]) {
+    largest = right_child;
+  }
 
-    if (largest != index)
-    {
-        std::swap(array[index], array[largest]);
-        Heapify(array, length, largest);
-    }
+  if (largest != index) {
+    std::swap(vec[index], vec[largest]);
+    Heapify(vec, length, largest);
+  }
 }
 
 /**
@@ -40,13 +37,15 @@ void Heapify(std::vector<T> &array, std::size_t length, std::size_t index)
  * heap.
  */
 template <typename T>
-void SortHeap(std::vector<T> &array)
-{
-    auto length{std::ssize(array)};
-    for (auto index{length - 1}; index > 0; --index)
-    {
-        std::swap(array.data()[0], array.data()[index]);
-        Heapify(array, static_cast<std::size_t> (index), 0);
-    }
+void SortHeap(std::vector<T> &vec) {
+  auto length{vec.size()};
+  if (length < 2) {
+    return;
+  }
+  for (auto index{length - 1}; index != 0; --index) {
+    std::swap(vec[0], vec[index]);
+    Heapify(vec, index, 0);
+  }
 }
+
 #endif
