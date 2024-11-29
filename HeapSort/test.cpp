@@ -1,37 +1,64 @@
 /**
- * test program for HeapSort.h.
+ * Test program for `HeapSort.h`.
  */
 
-#include <algorithm>
-#include <iostream>
-#include <vector>
-
 #include "HeapSort.h"
+#include <random>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <cinttypes>
+
+using Length = std::vector<int64_t>::size_type;
+
+/**
+ * Generate random max heap of 64-bits integral.
+ */
+std::vector<int64_t> GenerateMaxHeap(Length length) {
+  std::mt19937_64 mt{std::random_device{}()};
+  std::vector<int64_t> vec(length);
+  for (Length index{0}; index < length; ++index) {
+    vec[index] = mt();
+  }
+  std::make_heap(vec.begin(), vec.end());
+  return vec;
+}
+
+/**
+ * Check if the vector is sorted ascending order.
+ */
+bool IsSortedAsc(const std::vector<int64_t> &vec) {
+  for (Length index{1}; index < vec.size(); ++index) {
+    if (vec[index - 1] > vec[index]) {
+      return false;
+    }
+  }
+  return true;
+}
 
 int main() {
-  std::vector<int> vec{1, 2, 3, 4, 5, 6, 7};
-  std::vector<int> vec2{1, 2, 3, 4, 5, 6, 7};
-  std::make_heap(vec.begin(), vec.end());
-  std::make_heap(vec2.begin(), vec2.end());
-  std::cout << "heap element: ";
-  for (auto &i : vec) {
-    std::cout << i << " ";
+  std::vector<int64_t> vec{GenerateMaxHeap(10)};
+  std::vector<int64_t> vec2{vec};
+
+  std::cout << "Ordinary max heap:" << std::endl;
+  for (auto element : vec) {
+    std::cout << element << " ";
   }
-  std::cout << std::endl;
+  std::cout << std::endl << std::endl;
 
   SortHeap(vec);
-  std::cout << "SortHeap element: ";
-  for (auto &i : vec) {
-    std::cout << i << " ";
+  std::cout << "Sorted max heap by SortHeap:" << std::endl;
+  for (auto element : vec) {
+    std::cout << element << " ";
   }
   std::cout << std::endl;
+  std::cout << "Sorted correctly? " << IsSortedAsc(vec) 
+  << std::endl << std::endl;
 
   std::sort_heap(vec2.begin(), vec2.end());
-  std::cout << "heap sorted element: ";
-  for (auto &i : vec2) {
-    std::cout << i << " ";
+  std::cout << "Sorted max heap by std::sort_heap:" << std::endl;
+  for (auto element : vec) {
+    std::cout << element << " ";
   }
-  std::cout << std::endl;
-
-  return 0;
+  std::cout << std::endl << std::endl;
 }
