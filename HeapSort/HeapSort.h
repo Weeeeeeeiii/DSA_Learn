@@ -1,6 +1,7 @@
 /**
  * Provide personal implementation of heap sort.
  */
+
 #ifndef HEAP_SORT_H_
 #define HEAP_SORT_H_
 
