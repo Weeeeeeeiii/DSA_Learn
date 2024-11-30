@@ -1,4 +1,4 @@
-test: test.cpp HeapSort
+test: test.cpp HeapSort.h
 	g++ test.cpp -o test -std=c++20 -O2
 
 report: report.pdf
