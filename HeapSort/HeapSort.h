@@ -42,7 +42,7 @@ void SortHeap(std::vector<T> &vec) {
   if (length < 2) {
     return;
   }
-  for (auto index{length - 1}; index != 0; --index) {
+  for (auto index{length - 1}; index > 0; --index) {
     std::swap(vec[0], vec[index]);
     Heapify(vec, index);
   }
