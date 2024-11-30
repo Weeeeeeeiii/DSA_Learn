@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cinttypes>
 #include <string_view>
+#include <limits>
 
 using Length = std::vector<int64_t>::size_type;
 
@@ -24,20 +25,17 @@ enum class HeapType {
  */
 std::vector<int64_t> GenerateMaxHeap(Length length, 
                                      HeapType heap_type = HeapType::kRandom) {
-  std::mt19937_64 mt{std::random_device{}()};
   std::vector<int64_t> vec(length);
-
+  std::mt19937_64 mt{std::random_device{}()};
+  int64_t kMax = std::numeric_limits<int64_t>::max();
+  int64_t kMin = std::numeric_limits<int64_t>::lowest();
   if (heap_type == HeapType::kRepeat) {
-    const int64_t kMax = 1000000;
-    const int64_t kMin = -1000000;
-    std::uniform_int_distribution<int64_t> range{kMin, kMax};
-    for (Length index{0}; index < length; ++index) {
-      vec[index] = range(mt);
-    }
-  } else {
-    for (Length index{0}; index < length; ++index) {
-      vec[index] = mt();
-    }
+    kMax = 1000000;
+    kMin = -1000000;
+  }
+  std::uniform_int_distribution<int64_t> range{kMin, kMax};
+  for (Length index{0}; index < length; ++index) {
+    vec[index] = static_cast<int64_t>(range(mt));
   }
 
   if (heap_type == HeapType::kAscending) {
