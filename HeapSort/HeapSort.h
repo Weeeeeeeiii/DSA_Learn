@@ -14,7 +14,7 @@
  */
 template <typename T>
 void Heapify(std::vector<T> &vec, typename std::vector<T>::size_type length,
-             typename std::vector<T>::size_type index) {
+             typename std::vector<T>::size_type index = 0) {
   auto left_child{index * 2 + 1};
   auto right_child{left_child + 1};
   auto largest{index};
@@ -44,7 +44,7 @@ void SortHeap(std::vector<T> &vec) {
   }
   for (auto index{length - 1}; index != 0; --index) {
     std::swap(vec[0], vec[index]);
-    Heapify(vec, index, 0);
+    Heapify(vec, index);
   }
 }
 
