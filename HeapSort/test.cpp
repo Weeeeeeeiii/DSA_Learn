@@ -35,7 +35,7 @@ std::vector<int64_t> GenerateMaxHeap(Length length,
   }
   std::uniform_int_distribution<int64_t> range{kMin, kMax};
   for (Length index{0}; index < length; ++index) {
-    vec[index] = static_cast<int64_t>(range(mt));
+    vec[index] = range(mt);
   }
 
   if (heap_type == HeapType::kAscending) {
