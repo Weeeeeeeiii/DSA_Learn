@@ -2,47 +2,52 @@
  * Test program for `HeapSort.h`.
  */
 
-#include "HeapSort.h"
-#include <random>
-#include <vector>
-#include <iostream>
 #include <algorithm>
+#include <cassert>
+#include <chrono>
 #include <cinttypes>
-#include <string_view>
+#include <functional>
+#include <iostream>
 #include <limits>
+#include <random>
+#include <string_view>
+#include <vector>
 
-using Length = std::vector<int64_t>::size_type;
+#include "HeapSort.h"
+
+using Integer = std::int64_t;
+using Length = std::vector<Integer>::size_type;
 
 enum class HeapType {
   kRandom,
-  kAscending,
-  kDescending,
-  kRepeat,
+  kOrdered,
+  kReverse,
+  kRepetitive,
 };
 
 /**
  * Generate random max heap of 64-bits integral.
  */
-std::vector<int64_t> GenerateMaxHeap(Length length, 
+std::vector<Integer> GenerateMaxHeap(Length length,
                                      HeapType heap_type = HeapType::kRandom) {
-  std::vector<int64_t> vec(length);
+  std::vector<Integer> vec(length);
   std::mt19937_64 mt{std::random_device{}()};
-  int64_t kMax = std::numeric_limits<int64_t>::max();
-  int64_t kMin = std::numeric_limits<int64_t>::lowest();
-  if (heap_type == HeapType::kRepeat) {
+  Integer kMax = std::numeric_limits<Integer>::max();
+  Integer kMin = std::numeric_limits<Integer>::lowest();
+  if (heap_type == HeapType::kRepetitive) {
     kMax = 1000000;
     kMin = -1000000;
   }
-  std::uniform_int_distribution<int64_t> range{kMin, kMax};
+  std::uniform_int_distribution<Integer> range{kMin, kMax};
   for (Length index{0}; index < length; ++index) {
     vec[index] = range(mt);
   }
 
-  if (heap_type == HeapType::kAscending) {
+  if (heap_type == HeapType::kOrdered) {
     std::sort(vec.begin(), vec.end());
-  } else if (heap_type == HeapType::kDescending) {
-    std::sort(vec.begin(), vec.end(), std::greater<int64_t>());
-  } else 
+  } else if (heap_type == HeapType::kReverse) {
+    std::sort(vec.begin(), vec.end(), std::greater<Integer>());
+  } else
     ;
 
   std::make_heap(vec.begin(), vec.end());
@@ -52,7 +57,7 @@ std::vector<int64_t> GenerateMaxHeap(Length length,
 /**
  * Check if the vector is sorted ascending order.
  */
-bool IsSortedAsc(const std::vector<int64_t> &vec) {
+bool IsSortedAsc(const std::vector<Integer> &vec) {
   for (Length index{1}; index < vec.size(); ++index) {
     if (vec[index - 1] > vec[index]) {
       return false;
@@ -61,45 +66,74 @@ bool IsSortedAsc(const std::vector<int64_t> &vec) {
   return true;
 }
 
+/**
+ * Get the duration of `std::sort_heap`.
+ * Reference is not used because change of vector is avoided.
+ */
+void CheckStdSort(std::vector<Integer> vec) {
+  auto start_time{std::chrono::steady_clock::now()};
+  std::sort_heap(vec.begin(), vec.end());
+  auto end_time{std::chrono::steady_clock::now()};
+
+  assert(IsSortedAsc(vec) && "Check if a max heap is passed to std::sort_heap");
+  std::cout << "Test passed: std::sort_heap worked correctly!" << std::endl;
+
+  auto duration{std::chrono::duration_cast<std::chrono::milliseconds>(
+      end_time - start_time)};
+  std::cout << "Time taken: " << duration.count() << " ms" << std::endl;
+}
+
+/**
+ * Get the duration of `SortHeap`.
+ * Reference is not used because change of vector is avoided.
+ */
+void CheckMySort(std::vector<Integer> vec) {
+  auto start_time{std::chrono::steady_clock::now()};
+  SortHeap(vec);
+  auto end_time{std::chrono::steady_clock::now()};
+
+  assert(IsSortedAsc(vec) && "SortHeap error!");
+  std::cout << "Test passed: My SortHeap worked correctly!" << std::endl;
+
+  auto duration{std::chrono::duration_cast<std::chrono::milliseconds>(
+      end_time - start_time)};
+  std::cout << "Time taken: " << duration.count() << " ms" << std::endl;
+}
+
 int main() {
-  // Random vector test
-  std::vector<int64_t> random_vec{GenerateMaxHeap(10000000)};
-  std::cout << (IsSortedAsc(random_vec) ? "Is" : "Not") << " sorted. " 
-  << std::endl;
+  // Set test dataset
+  const Length length = 1000000;
+  std::cout << "Start test with dataset number: " << length << std::endl;
+  std::cout << std::endl;
 
-  SortHeap(random_vec);
-  std::cout << (IsSortedAsc(random_vec) ? "Is" : "Not") << " sorted. " 
-  << std::endl;
+  // Test random vector
+  std::cout << "Random vector test:" << std::endl;
+  std::vector<Integer> random_vec{GenerateMaxHeap(length, HeapType::kRandom)};
+  CheckStdSort(random_vec);
+  CheckMySort(random_vec);
+  std::cout << std::endl;
 
-  // Ascent vector test
-  std::vector<int64_t> ascent_vec{
-      GenerateMaxHeap(10000000, HeapType::kAscending)};
-  std::cout << (IsSortedAsc(ascent_vec) ? "Is" : "Not") << " sorted. " 
-  << std::endl;
+  // Test ordered vector
+  std::cout << "Ordered vector test:" << std::endl;
+  std::vector<Integer> ordered_vec{GenerateMaxHeap(length, HeapType::kOrdered)};
+  CheckStdSort(ordered_vec);
+  CheckMySort(ordered_vec);
+  std::cout << std::endl;
 
-  SortHeap(ascent_vec);
-  std::cout << (IsSortedAsc(ascent_vec) ? "Is" : "Not") << " sorted. " 
-  << std::endl;  
-  
-  // Descent vector test
-  std::vector<int64_t> descent_vec{
-      GenerateMaxHeap(10000000, HeapType::kDescending)};
-  std::cout << (IsSortedAsc(descent_vec) ? "Is" : "Not") << " sorted. " 
-  << std::endl;
+  // Test reverse vector
+  std::cout << "Reverse vector test:" << std::endl;
+  std::vector<Integer> reverse_vec{GenerateMaxHeap(length, HeapType::kReverse)};
+  CheckStdSort(reverse_vec);
+  CheckMySort(reverse_vec);
+  std::cout << std::endl;
 
-  SortHeap(descent_vec);
-  std::cout << (IsSortedAsc(descent_vec) ? "Is" : "Not") << " sorted. " 
-  << std::endl;  
-  
-  // Repeated vector test
-  std::vector<int64_t> repeated_vec{
-      GenerateMaxHeap(10000000, HeapType::kRepeat)};
-  std::cout << (IsSortedAsc(repeated_vec) ? "Is" : "Not") << " sorted. " 
-  << std::endl;
-
-  SortHeap(repeated_vec);
-  std::cout << (IsSortedAsc(repeated_vec) ? "Is" : "Not") << " sorted. " 
-  << std::endl;
+  // Test repetitive vector
+  std::cout << "Repetitive vector test:" << std::endl;
+  std::vector<Integer> repetitive_vec{
+      GenerateMaxHeap(length, HeapType::kRepetitive)};
+  CheckStdSort(repetitive_vec);
+  CheckMySort(repetitive_vec);
+  std::cout << std::endl;
 
   return 0;
 }
