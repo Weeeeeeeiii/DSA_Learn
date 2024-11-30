@@ -8,6 +8,6 @@ report.pdf: report.tex
 	rm report.aux report.log
 
 clean:
-	rm main test report.pdf
+	rm test report.pdf
 
 .PHONY: report clean
