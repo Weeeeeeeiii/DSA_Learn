@@ -3,25 +3,22 @@
  * Call EvaluateExpression to calculate the result of expression, then print it.
  */
 
-#include "expression_evaluator.h"
 #include <iostream>
-#include <string>
 #include <stdexcept>
+#include <string>
 
-int main()
-{
-    std::cout << "Please enter the four arithmetic expression.\n";
-    std::cout << "Valid charactors: [0-9] + - * / ( )\n";
-    std::string expression{};
-    std::getline(std::cin >> std::ws, expression);
-    try
-    {
-        std::cout << "Result: " << EvaluateExpression(expression) << std::endl;
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Fatal: " << e.what() << std::endl;
-    }
+#include "expression_evaluator.h"
 
-    return 0;
+int main() {
+  std::cout << "Please enter the four arithmetic expression.\n";
+  std::cout << "Valid charactors: [0-9] + - * / ( )\n";
+  std::string expression{};
+  std::getline(std::cin >> std::ws, expression);
+  try {
+    std::cout << "Result: " << EvaluateExpression(expression) << std::endl;
+  } catch (const std::exception& e) {
+    std::cerr << "Fatal: " << e.what() << std::endl;
+  }
+
+  return 0;
 }
