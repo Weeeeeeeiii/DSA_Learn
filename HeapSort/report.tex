@@ -1,0 +1,118 @@
+\documentclass[UTF8, 12pt]{ctexart}
+\usepackage{geometry}
+
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{朱思威, 3220104624}
+\chead{数据结构与算法第七次作业：堆排序实现}
+\rhead{\today}
+
+\begin{document}
+\section{设计思路}
+关于 \verb|SortHeap| 函数，目的是对标 \verb|std::sort_heap|，
+接收一个已成为最大堆的 \verb|vector| 并对它排序。
+
+\verb|SortHeap| 会将接收的 \verb|vector| 的第一个元素（最大的元素）和最后一个元素替换，
+然后忽略最后一个元素，将剩下的元素重新排序为最大堆。然后将第一个元素和倒数第二个元素替换，
+忽略最后两个元素，将剩下的元素再次排序为最大堆。这样递归地将第一个元素和倒数第 $n$ 个元素替换，
+并忽略最后 $n$ 个元素，将剩下的元素再排序为最大堆，直到 $n = (\text{vector 的长度}) - 1$。
+具体实现细节：
+\begin{verbatim}
+auto length{vec.size}
+for (auto index{length - 1}; index > 0; --index) {
+  std::swap(vec[0], vec[index]);
+  Heapify(vec, index); // 这步是递归地将剩下元素排序为最大堆，详见下面
+}
+\end{verbatim}
+\verb|Heapify| 会从根节点开始，检查两个子节点是否大于父节点，如果是，挑选较大的子节点
+和父节点交换。并递归地以被交换的节点作根节点重复上述流程，直到根节点成为叶子节点时停止。实现细节
+如下：
+\begin{verbatim}
+template <typename T>
+void Heapify(std::vector<T> &vec, typename std::vector<T>::size_type length,
+             typename std::vector<T>::size_type index = 0) {
+  auto left_child{index * 2 + 1};
+  auto right_child{left_child + 1};
+  auto largest{index};
+
+  if (left_child < length && vec[left_child] > vec[largest]) {
+    largest = left_child;
+  }
+  if (right_child < length && vec[right_child] > vec[largest]) {
+    largest = right_child;
+  }
+
+  if (largest != index) {
+    std::swap(vec[index], vec[largest]);
+    Heapify(vec, length, largest);
+  }
+}
+\end{verbatim}
+\section{测试流程}
+在 \verb|test.cpp| 中测试 \verb|SortHeap| 的两个方面：
+\begin{itemize}
+  \item 排序结果是否正确
+  \item 与 \verb|std::sort_heap| 的效率差别
+\end{itemize}
+\verb|SortHeap| 与 \verb|std::sort_heap| 同样接受已排序为最大堆的 \verb|vector|，
+分别调用两个函数进行排序，并对排序所用时间计时。
+\section{测试结果}
+分别采用长度为 1\,000\,000, 2\,000\,000, 5\,000\,000 的随机、有序、倒序、重复数组测试 
+\verb|std::sort_heap| 和 \verb|SortHeap| 和排序的正确性和排序时间。在 \verb|O2| 优化下
+结果如下：
+\begin{table}[hp]
+  \centering
+  \begin{tabular}{|l|r|r|}
+    \hline
+    sequence type       & \verb|SortHeap| time & \verb|std::sort_heap| time \\ \hline
+    random sequence     & 145 ms               & 91 ms                      \\ \hline
+    ordered sequence    & 54 ms                & 31 ms                      \\ \hline
+    reverse sequence    & 59 ms                & 38 ms                      \\ \hline
+    repetitive sequence & 133 ms               & 88 ms                      \\ \hline
+  \end{tabular}
+  \caption{1\,000\,000 长度数组}
+\end{table}
+\begin{table}[hp]
+  \centering
+  \begin{tabular}{|l|r|r|}
+    \hline
+    sequence type       & \verb|SortHeap| time & \verb|std::sort_heap| time \\ \hline
+    random sequence     & 366 ms               & 202 ms                     \\ \hline
+    ordered sequence    & 114 ms               & 63 ms                      \\ \hline
+    reverse sequence    & 137 ms               & 83 ms                      \\ \hline
+    repetitive sequence & 393 ms               & 198 ms                     \\ \hline
+  \end{tabular}
+  \caption{2\,000\,000 长度数组}
+\end{table}
+\begin{table}[hp]
+  \centering
+  \begin{tabular}{|l|r|r|}
+    \hline
+    sequence type       & \verb|SortHeap| time & \verb|std::sort_heap| time \\ \hline
+    random sequence     & 1987 ms              & 833 ms                     \\ \hline
+    ordered sequence    & 304 ms               & 168 ms                     \\ \hline
+    reverse sequence    & 364 ms               & 209 ms                     \\ \hline
+    repetitive sequence & 1599 ms             & 741 ms                     \\ \hline
+  \end{tabular}
+  \caption{5\,000\,000 长度数组}
+\end{table}
+\end{document}
