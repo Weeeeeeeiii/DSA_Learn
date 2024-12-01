@@ -100,9 +100,12 @@ void CheckMySort(std::vector<Integer> vec) {
   std::cout << "Time taken: " << duration.count() << " ms" << std::endl;
 }
 
-int main() {
-  // Set test dataset
-  const Length length = 1000000;
+/**
+ * Use different types and length to test the correctness and efficiency
+ * of both std::sort_heap and SortHeap.
+ * Print results to terminal.
+ */
+void Test(const Length length) {
   std::cout << "Start test with dataset number: " << length << std::endl;
   std::cout << std::endl;
 
@@ -134,6 +137,15 @@ int main() {
   CheckStdSort(repetitive_vec);
   CheckMySort(repetitive_vec);
   std::cout << std::endl;
+
+  std::cout << std::endl;
+}
+
+int main() {
+  // Set test dataset
+  Test(1000000);
+  Test(2000000);
+  Test(5000000);
 
   return 0;
 }
