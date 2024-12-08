@@ -16,7 +16,7 @@
 /**
  * All menber function is static,and only `Evaluate` is public.
  * Use `Evaluate` to calculate expression.
- * Only `[0-9]` and `+ - * / ( ) SPC` is valid charactor.
+ * Only `[0-9]` and `+ - * / ( ) SPC` is valid character.
  */
 class ExpressionEvaluator {
  public:
@@ -62,7 +62,7 @@ class ExpressionEvaluator {
           break;
         default:
           assert(false &&
-                 "Charactor not operators and parentheses be passed into "
+                 "character not operators and parentheses be passed into "
                  "expressing_evaluator.h");
       }
     }
@@ -90,14 +90,14 @@ class ExpressionEvaluator {
   }
 
   /**
-   * Check if a charactor is an operator amoung 4 rules.
+   * Check if a character is an operator amoung 4 rules.
    */
   static bool IsOperator(char c) {
     return (c == '+' || c == '-' || c == '*' || c == '/');
   }
 
   /**
-   * Check if a charactor is a valid decimal point.
+   * Check if a character is a valid decimal point.
    */
   static bool IsValidDecimalPoint(char c, bool point_is_added,
                                   const std::string &buffer) {
@@ -130,16 +130,22 @@ class ExpressionEvaluator {
     // as a token. Then push it into output queue.
     std::string buffer{};
 
-    // Checking variable is used to determine when the `-` is negative or
-    // operator and whether the decimal point and e (exponent to base 10) is
-    // valid charactor in this position.
+    // Determine '-' is operator minus or negative character
     bool expect_negative_sign{true};
+
+    // Indentifier about if decimal points and 'e's have existed in buffer to
+    // avoid multiple decimal points and 'e's. `previous_is_<*>` is to determine
+    // when to put valid decimal point and numeric inluding negative sign.
     bool point_is_added{false};
     bool e_is_added{false};
     bool previous_is_e{false};
     bool previous_is_digit{false};
+
+    // This identifier is to guarentee a digit after decimal point and negative
+    // sign in exponent
     bool next_must_be_digit{false};
 
+    // The following component is to address numeric component
     for (char c : infix) {
       if (std::isspace(c)) {
         continue;
@@ -213,6 +219,7 @@ class ExpressionEvaluator {
         previous_is_e = false;
       }
 
+      // From now on begin address operators
       if (IsOperator(c)) {
         if (c == '-' && expect_negative_sign) {
           // Address negative sign by converting `-a` into `(0-a)`. So '-' must
@@ -254,6 +261,9 @@ class ExpressionEvaluator {
     }
 
     if (!buffer.empty()) {
+      if (!std::isdigit(buffer.back())) {
+        throw std::invalid_argument("Mising digit");
+      }
       output.push(buffer);
     }
     while (!operators.empty()) {
