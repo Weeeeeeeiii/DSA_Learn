@@ -1,7 +1,7 @@
-main: main.cc expression_evaluator.h infix_to_postfix.h
+main: main.cc expression_evaluator.h
 	g++ main.cc -o main -O2 -std=c++20
 
-test: test.cc expression_evaluator.h infix_to_postfix.h
+test: test.cc expression_evaluator.h
 	g++ test.cc -o test -O2 -std=c++20
 
 report: report.pdf

@@ -13,7 +13,7 @@ void TestValidExpression(const std::string &expression, double expected)
 {
     try
     {
-        double result = EvaluateExpression(expression);
+        double result = ExpressionEvaluator::Evaluate(expression);
         // Allow for small floating point errors
         assert(std::abs(result - expected) < 1e-9 &&
         "Wrong calculation result");
@@ -36,7 +36,7 @@ void TestInvalidExpression(const std::string &expression)
     try
     {
         // This call should not succeed
-        EvaluateExpression(expression);
+        ExpressionEvaluator::Evaluate(expression);
         std::cerr << "FAIL: " << expression << 
         " did not throw exception as expected." << std::endl;
         // Make sure program stops at test failure

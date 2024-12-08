@@ -15,7 +15,9 @@ int main() {
   std::string expression{};
   std::getline(std::cin >> std::ws, expression);
   try {
-    std::cout << "Result: " << EvaluateExpression(expression) << std::endl;
+    std::cout << "Result: "
+              << ExpressionEvaluator::Evaluate(expression)
+              << std::endl;
   } catch (const std::exception& e) {
     std::cerr << "Fatal: " << e.what() << std::endl;
   }
