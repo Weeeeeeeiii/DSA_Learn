@@ -14,7 +14,7 @@
 #include <string>
 
 /**
- * All menber function is static,and only `Evaluate` is public. 
+ * All menber function is static,and only `Evaluate` is public.
  * Use `Evaluate` to calculate expression.
  * Only `[0-9]` and `+ - * / ( ) SPC` is valid charactor.
  */
@@ -129,28 +129,90 @@ class ExpressionEvaluator {
     // buffer here is used to storage multiple digits and valid decimal point
     // as a token. Then push it into output queue.
     std::string buffer{};
+
+    // Checking variable is used to determine when the `-` is negative or
+    // operator and whether the decimal point and e (exponent to base 10) is
+    // valid charactor in this position.
     bool expect_negative_sign{true};
     bool point_is_added{false};
+    bool e_is_added{false};
+    bool previous_is_e{false};
+    bool previous_is_digit{false};
+    bool next_must_be_digit{false};
 
     for (char c : infix) {
       if (std::isspace(c)) {
         continue;
       }
-      if (IsValidDecimalPoint(c, point_is_added, buffer)) {
-        buffer += c;
-        point_is_added = true;
-        continue;
+      if (next_must_be_digit && !std::isdigit(c)) {
+        throw std::invalid_argument("Digit missing");
       }
       if (std::isdigit(c)) {
         buffer += c;
         expect_negative_sign = false;
+        next_must_be_digit = false;
+        previous_is_digit = true;
+        previous_is_e = false;
+        continue;
+      }
+      if (c == '.') {
+        if (!buffer.length()) {
+          throw std::invalid_argument("No digits before the decimal point");
+        }
+        if (point_is_added) {
+          throw std::invalid_argument("Multiple decimal points exist");
+        }
+        if (!previous_is_digit) {
+          throw std::invalid_argument("No digit before the decimal point");
+        }
+        if (e_is_added) {
+          throw std::invalid_argument("The exponent part only support integer");
+        }
+
+        buffer += '.';
+        point_is_added = true;
+        next_must_be_digit = true;
+        previous_is_digit = false;
+        previous_is_e = false;
+        continue;
+      }
+      if (c == 'e' || c == 'E') {
+        if (!buffer.length()) {
+          throw std::invalid_argument("No digit before 'e' or 'E'");
+        }
+        if (e_is_added) {
+          throw std::invalid_argument("Multiple 'e' or 'E' exist");
+        }
+        if (!previous_is_digit) {
+          throw std::invalid_argument("No digit before 'e' or 'E'");
+        }
+
+        buffer += c;
+        e_is_added = true;
+        previous_is_digit = false;
+        previous_is_e = true;
         continue;
       }
       if (!buffer.empty()) {
+        if (previous_is_e) {
+          if (c != '-') {
+            throw std::invalid_argument("Invalid character after 'e' or 'E'");
+          }
+          buffer += '-';
+          next_must_be_digit = true;
+          previous_is_digit = false;
+          previous_is_e = false;
+          continue;
+        }
         output.push(buffer);
         buffer.clear();
         point_is_added = false;
+        e_is_added = false;
+        next_must_be_digit = false;
+        previous_is_digit = false;
+        previous_is_e = false;
       }
+
       if (IsOperator(c)) {
         if (c == '-' && expect_negative_sign) {
           // Address negative sign by converting `-a` into `(0-a)`. So '-' must
