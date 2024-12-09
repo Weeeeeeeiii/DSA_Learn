@@ -1,6 +1,6 @@
 /**
  * Only include a class `ExpressionEvaluator` used to evaluate expression.
- * Allow `+ - * / ( )` and space.
+ * Allow `+ - * / ( ) e E` and space. 
  */
 
 #ifndef EXPRESSION_EVALUATOR_H_
@@ -16,7 +16,7 @@
 /**
  * All menber function is static,and only `Evaluate` is public.
  * Use `Evaluate` to calculate expression.
- * Only `[0-9]` and `+ - * / ( ) SPC` is valid character.
+ * Only `[0-9]` and `+ - * / ( ) e E SPC` is valid character.
  */
 class ExpressionEvaluator {
  public:

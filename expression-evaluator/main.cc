@@ -11,7 +11,9 @@
 
 int main() {
   std::cout << "Please enter the four arithmetic expression.\n";
-  std::cout << "Valid charactors: [0-9] + - * / ( )\n";
+  std::cout << "Scientific notation is supported.\n";
+  std::cout << "Valid charactors: [0-9] + - * / ( ) e E\n";
+  std::cout << "For example:\nInput: 1e2 + -2.1e0\nOutput: 97.9\nInput: ";
   std::string expression{};
   std::getline(std::cin >> std::ws, expression);
   try {

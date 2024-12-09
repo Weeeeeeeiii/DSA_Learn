@@ -17,17 +17,6 @@
 \usepackage{listings}
 \usepackage{float, caption}
 
-\newcommand{\dif}{\mathrm{d}}
-\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
-\newcommand{\difFrac}[2]{\frac{\dif #1}{\dif #2}}
-\newcommand{\pdfFrac}[2]{\frac{\partial #1}{\partial #2}}
-\newcommand{\OFL}{\mathrm{OFL}}
-\newcommand{\UFL}{\mathrm{UFL}}
-\newcommand{\fl}{\mathrm{fl}}
-\newcommand{\op}{\odot}
-\newcommand{\Eabs}{E_{\mathrm{abs}}}
-\newcommand{\Erel}{E_{\mathrm{rel}}}
-
 \pagestyle{fancy}
 \fancyhead{}
 \lhead{朱思威, 3220104624}
@@ -36,36 +25,70 @@
 
 \begin{document}
 \section{设计思路}
-四则混合运算器仅考虑字符 \verb|+ - * / . ( )| 空子符和数字字符 \verb|[0-9]| 的输入。故设
-置循环字符变量 \verb|c| 遍历整个表达式，并分别根据其类型进行不同的处理。
-\subsection{预处理}
-首先将原本的字符串类型的中缀表达式转换为字符串 token 数组组成的后缀表达式，
-将多个数字字符组成的一个数放入一个 token 中，将算符独立放在一个 token 中，
-这样就方便后续的计算。
+对四则运算表达式的处理主要分为两个部分：
+\begin{itemize}
+  \item 将类型为 \texttt{std::string} 的中缀表达式转换为由 token 组成的 
+  \texttt{std::queue<std::string>}．
+  \item 将转换后的队列中的 token 压入栈，并在试图压入运算符时推出栈顶元素并做相应运算，将结果
+  重新压入栈中．
+\end{itemize}
+\section{具体实现}
+头文件 \texttt{expression\_evaluator.h} 中实现了用于计算四则运算表达式的函数\newline
+\texttt{ExpressionEvaluator::Evaluate}, 它被包裹在类 \texttt{ExpressionEvaluator} 中是
+为了隐藏它调用的函数．\texttt{ExpressionEvaluator} 中也仅暴露了这一个公共函数．
 
-采用的算法是 Shungting Yard 算法：创建一个存放数的队列和存放算符的栈，
-通过算符的优先级根据一定的规则将算符依次放入栈和队列中。
-具体的实现在头文件 \verb|infix_to_postfix.h| 中。
-\subsubsection{关于负数的处理}
-\verb|infix_to_postfix| 通过 Boolean 变量 \verb|expect_negative| 来判断
-当 \verb|c = '-'| 时，\verb|c| 代表的是操作符减号还是放在数前面的负号。
-如果检测到是负号，形如 \verb|-x|，则转换为 \verb|(0-x)| 来处理。
-\subsubsection{关于小数的处理}
-另一个 Boolean 变量 \verb|is_added| 用于判断数中的小数点是否已添加，
-如果其值为 \verb|true|，那么在遇到小数点后报错：多个小数点。
-\subsection{计算}
-将处理完的表达式进行计算：把其中的 token 一一压入另一个栈中。
-如果 token 是数字则直接压入不做任何操作；
-如果 token 是算符则首先检查粘中是否至少有两个数 token，没有则报错。
-然后将两个数字退出并做相应的计算，将计算结果再次压回栈中。
-具体的实现在头文件 \verb|express_evaluator.h| 中。
-\subsection{主程序}
-主程序调用 \verb|express_evaluator.h| 中的计算函数 \verb|EvaluateExpression| 来计算
-从终端传入的字符串，并抓取异常抛出。若无异常则给出计算结果。
-\section{结果处理}
-在当前目录下通过命令 \verb|make main| 即可输入表达式。如果输入的是合法表达式，
-那么直接给出结果；反之丢出异常提示。
+\texttt{Evaluate} 中将中缀表达式转换为后缀表达式的函数是 \texttt{InfixToPostfix}, 
+它作为类\newline \texttt{ExpressionEvaluator} 中的私有函数．
+\subsection{\texttt{InfixToPostfix} 的实现}
+合法的数字运算表达式可分为数字部分和运算符部分，每一个部分将被作为一个整体（即 token）．
+\texttt{InfixToPostfix} 会用一个字符 \texttt{c} 遍历整个表达式字符串，若 \texttt{c} 是
+空格，则进行下一个字符的检测．重点则在于分别数字和运算符．
+\subsubsection{数字部分}
+显而易见的是如果 \texttt{c} 是数字，那么应该将其和相连的数字整体作为一个 token．
+因此设置一个缓冲区，即代码中的 \texttt{buffer}．只要遍历到数字就将其放入缓冲区中．直到检测到
+运算符，再把缓冲区作为一个 token 压入结果队列 \texttt{output}．
 
-命令 \verb|make test| 即可根据 \verb|express_evaluator.h| 生成一个测试文件。其中提供了
-各种不同的合法测试和不合法测试。如果出现合法测试报异常或不合法测试不报异常则测试程序中断，否则最后输出 \verb|All tests passed|。
+由于要考虑小数点和科学计数法，\texttt{e}、\texttt{E} 和小数点也被作为数字部分放入
+缓冲区中．关键的问题就在于如何检测此时的小数点和 \texttt{e} 是合法的．
+
+首先显然的是缓冲区没有数字时小数点和 \texttt{e} 的输入显然不合法．
+此外本程序使用了五个判定变量来确保小数点和 \texttt{e} 的合法性，避免不合法的数
+（形如 \verb|2.1.1|）．具体来说：
+\begin{itemize}
+  \item \texttt{point\_is\_added} 用来判断小数点是否已在数字中添加．若为真则表示小数已被
+  添加过，再检测到数字中有小数则丢出异常．初始值为 \texttt{false}，
+  在检测到小数点进入 \texttt{buffer} 后为 \texttt{true}，在 \texttt{buffer} 被
+  压入结果队列后重新赋值为 \texttt{false}．
+  \item \texttt{e\_is\_added} 与上类似，用于确保 \texttt{e} 或 \texttt{E} 不被重复添加．
+  \item \texttt{previous\_is\_digit} 用于确保小数点和 \texttt{e} 仅在数字后面被添加．
+  检测形如 \verb|1.e| 的语法错误．初始值为 \texttt{false}，检测到 \texttt{c} 为数字时
+  赋值为 \texttt{true}，否则赋值为 \texttt{false}．
+  \item \texttt{previous\_is\_e} 与上类似，用于确保指数部分的负号仅在 \texttt{e} 后被添加．
+  \item \texttt{next\_must\_be\_digit} 用于确保小数点和 \texttt{e} 后必须添加数字，默认
+  为 \texttt{false}，\texttt{c} 为小数点和 \texttt{e} 后赋值 \texttt{true}，
+  否则赋值为 \texttt{false}．
+\end{itemize}
+通过对以上五个判定变量做条件控制，并在数字被压入 \texttt{buffer} 后更新其状态，确保了科学
+计数法的合法输入．
+\subsubsection{运算符部分}
+将运算符压入栈，如果将要压入的运算符优先级并不比栈顶的运算符优先级大，则先把栈中的运算符推出，
+作为 token 压入结果队列，直到将压入的运算符优先级比栈顶的大．检测到 \texttt{)} 时则把 
+\texttt{(} 之上的运算符全推出压进结果队列中．
+
+至于对 \texttt{-} 是负号还是减号的判断，通过标识变量 \texttt{expect\_negative\_sign} 
+判断．其为真是预期负号输入，将 \verb|-a| 转换为 \verb|(0-a)|．当检测到运算符后预期为负号
+输入，反之则预期减号．初始预期负号
+
+至于为何不将 \texttt{-a} 直接整体作为 token 压入队列．因为这不支持形如 \verb|-(a)| 负号后带
+括号的表达式．
+\subsection{\texttt{Evaluate} 的实现}
+通过 \texttt{std::string} 提供的 \texttt{stod} 将数字类型的 token 转换为 \texttt{double} 
+压入结果栈中，并在遍历到运算符时将最顶上的两个数字做相应运算，再压入栈中．
+\section{结果分析}
+\texttt{main.cc} 作为主函数，编译后即可产生四则运算计算器程序，按提示输入表达式后即可计算．
+
+\texttt{test.cc} 作为测试函数，调用 \texttt{ExpressionEvaluator::Evaluate} 计算合法
+和不合法样例，若合法样例报错或者不合法样例报错，均中断，否则运行成功：提示所有样例通过．
+
+经测试：主函数正常运行，能正常报错，支持小数点、括号、和科学计数法．测试程序通过．
 \end{document}
